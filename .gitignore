@@ -61,6 +61,13 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
+# Databases
+*.sqlite3
+*.db
+
+# OS files
+.DS_Store
+
 # Flask stuff:
 instance/
 .webassets-cache
