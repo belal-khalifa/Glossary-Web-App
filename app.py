@@ -1,8 +1,8 @@
-from flask import Flask, g, render_template, redirect, request, session
+from flask import Flask, flash, g, render_template, redirect, request, session, url_for
 import os, sqlite3
 
 app = Flask(__name__)
-
+app.secret_key = "staticfornow"
 DATABASE = 'glossary.db'
 
 def get_db():
@@ -31,7 +31,8 @@ if __name__ == "__main__":
         init_db()
     app.run(debug=True)
 
-@app.route("/view")
+
+@app.route("/")
 def view_terms():
     search = request.args.get("search", "").strip()
     db = get_cursor()
@@ -40,16 +41,46 @@ def view_terms():
 
 @app.route("/entry", methods=["GET", "POST"])
 def add_term():
-    return ("Page under construction")
+    if request.method=='GET':
+        return render_template('entry.html')
+    newterm = request.form.get('term', '')
+    category = request.form.get('category', '')
+    definition = request.form.get('definition', '')
+    example = request.form.get('example', '')
+    if not all(field.strip() for field in [newterm, category, definition]):
+        flash("Term, Definition and Category are required")
+        return render_template('entry.html', term={'term':newterm,'category':category,'definition':definition,'example':example})
+    else:
+        db = get_cursor()
+        db.execute("INSERT INTO terms (term, definition, category, example) VALUES (?, ?, ?, ?)", (newterm, definition, category, example))
+        get_db().commit()
+        flash(f'Term "{newterm}" added successfully!')
+        return redirect(url_for('add_term'))
 
-@app.route("/edit", methods=["GET", "POST"])
-def edit_term():
-    return ("Page under construction")
+@app.route("/edit/<int:term_id>", methods=["GET", "POST"])
+def edit_term(term_id):
+    if request.method=="GET":
+        term = get_cursor().execute("SELECT * FROM terms WHERE id = ?",(term_id,)).fetchone()
+        if not term:
+            flash("Term not found")
+            return redirect(url_for('view_terms'))
+        return render_template('edit.html', term=term)
+    term = request.form.get('newterm', '').strip()
+    category = request.form.get('category', '').strip()
+    definition = request.form.get('definition', '').strip()
+    example = request.form.get('example', '').strip()
+    for k,v in {'term':term, 'category':category, 'definition':definition, 'example':example}.items():
+        if v:
+            get_cursor().execute(f"UPDATE terms SET {k} = ? WHERE id = ?",(v, term_id))
+    get_db().commit()
+    flash(f"Term {term} updated successfully!")
+    return redirect(url_for('view_terms'))
 
-@app.route("/delete", methods=["GET", "POST"])
-def delete_term():
-    return ("Page under construction")
+@app.route("/delete/<int:term_id>", methods=["POST"])
+def delete_term(term_id):
+    term = get_cursor().execute("SELECT term FROM terms WHERE id = ?",(term_id,)).fetchone()
+    get_cursor().execute("DELETE FROM terms WHERE id = ?",(term_id,))
+    flash(f"Term {term['term']} deleted successfully!")
+    get_db().commit()
+    return redirect(url_for('view_terms'))
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    return ("Page under construction")

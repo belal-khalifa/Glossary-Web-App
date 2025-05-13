@@ -40,10 +40,12 @@
                         <td>{{ term.category or '—' }}</td>
                         <td>{{ term.definition[:100] }}{% if term.definition|length > 100 %}...{% endif %}</td>
                         <td>
-                            <a href="{{ url_for('edit_term', term_id=term.id) }}"
-                                class="btn btn-sm btn-warning">Edit</a>
-                            <a href="{{ url_for('delete_term', term_id=term.id) }}" class="btn btn-sm btn-danger"
-                                onclick="return confirm('Delete this term?');">Delete</a>
+                            <form action="{{ url_for('edit_term', term_id=term.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-warning">Edit</button>
+                            </form>
+                            <form action="{{ url_for('delete_term', term_id=term.id) }}" method='POST' style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this term?')">Delete</button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}
