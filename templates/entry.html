@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}Add Glossary Term{% endblock %}
+
+{% block content %}
+<!-- Page Heading -->
+<h1 class="h3 mb-4 text-gray-800">Add a New Term</h1>
+
+<!-- Term Entry Form -->
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('add_term') }}">
+            <div class="form-group">
+                <label for="term">Term</label>
+                <input type="text" class="form-control" id="term" name="term" required
+                    value="{{ term.term if term else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="category">Category</label>
+                <input type="text" class="form-control" id="category" name="category"
+                    value="{{ term.category if term else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="definition">Definition</label>
+                <textarea class="form-control" id="definition" name="definition" rows="4"
+                    required>{{ term.definition if term else '' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="example">Example (optional)</label>
+                <textarea class="form-control" id="example" name="example"
+                    rows="2">{{ term.example if term else '' }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Term</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

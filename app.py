@@ -23,7 +23,33 @@ def init_db():
     cursor.execute("CREATE TABLE IF NOT EXISTS terms (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, term TEXT NOT NULL, definition TEXT NOT NULL, category TEXT, example TEXT)")
     db.commit()
 
+def get_cursor():
+    return get_db().cursor()
+
 if __name__ == "__main__":
     with app.app_context():
         init_db()
     app.run(debug=True)
+
+@app.route("/view")
+def view_terms():
+    search = request.args.get("search", "").strip()
+    db = get_cursor()
+    terms = db.execute("SELECT * FROM terms WHERE term LIKE ? ORDER BY term ASC", (f"%{search}%",)).fetchall()
+    return render_template('viewer.html', terms=terms)
+
+@app.route("/entry", methods=["GET", "POST"])
+def add_term():
+    return ("Page under construction")
+
+@app.route("/edit", methods=["GET", "POST"])
+def edit_term():
+    return ("Page under construction")
+
+@app.route("/delete", methods=["GET", "POST"])
+def delete_term():
+    return ("Page under construction")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    return ("Page under construction")
