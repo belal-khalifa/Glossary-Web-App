@@ -3,7 +3,7 @@ import os, sqlite3
 
 app = Flask(__name__)
 app.secret_key = "staticfornow"
-DATABASE = 'glossary.db'
+DATABASE = os.path.join(os.getcwd(),'glossary.db')
 
 def get_db():
     if 'db' not in g:
@@ -27,10 +27,11 @@ def get_cursor():
     return get_db().cursor()
 
 if __name__ == "__main__":
-    with app.app_context():
-        init_db()
     app.run(debug=True)
 
+if not os.path.exists(DATABASE):
+    with app.app_context():
+        init_db()
 
 @app.route("/")
 def view_terms():
